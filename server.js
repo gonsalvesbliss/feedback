@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 // Connect MongoDB
-mongoose.connect('mongodb+srv://bliss:reuse123@cluster0.gj6rszv.mongodb.net/feedbackdb?retryWrites=true&w=majority')
+mongoose.connect('mongo_db_url')
   .then(() => console.log("MongoDB Atlas Connected"))
   .catch(err => console.log(err));
 
