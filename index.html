@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Feedback Manager</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      width: 400px;
+      margin: 50px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #4facfe;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: #007bff;
+    }
+
+    .feedback-list {
+      margin-top: 20px;
+    }
+
+    .card {
+      background: #f9f9f9;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .delete-btn {
+      background: red;
+      padding: 5px 10px;
+      border-radius: 5px;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background: darkred;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Student Feedback</h2>
+
+  <form id="form">
+    <input type="text" id="name" placeholder="Student Name" required>
+    <input type="text" id="course" placeholder="Course Name" required>
+    <input type="number" id="rating" placeholder="Rating (1-5)" min="1" max="5">
+    <textarea id="comments" placeholder="Comments"></textarea>
+    <button type="submit">Submit Feedback</button>
+  </form>
+
+  <div class="feedback-list" id="list"></div>
+</div>
+
+<script>
+// Submit Feedback
+document.getElementById("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const data = {
+    studentName: document.getElementById("name").value,
+    courseName: document.getElementById("course").value,
+    rating: document.getElementById("rating").value,
+    comments: document.getElementById("comments").value
+  };
+
+  await fetch("http://localhost:3000/feedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  alert(" Feedback Submitted!");
+  loadFeedback();
+});
+
+
+// Load Feedback
+async function loadFeedback() {
+  const res = await fetch("http://localhost:3000/feedback");
+  const data = await res.json();
+
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  data.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div>
+        <strong>${item.studentName}</strong><br>
+        ${item.courseName}  ${item.rating}<br>
+        <small>${item.comments}</small>
+      </div>
+      <button class="delete-btn" onclick="deleteFeedback('${item._id}')">Delete</button>
+    `;
+
+    list.appendChild(div);
+  });
+}
+
+
+// Delete Feedback
+async function deleteFeedback(id) {
+  await fetch(`http://localhost:3000/feedback/${id}`, {
+    method: "DELETE"
+  });
+  loadFeedback();
+}
+
+loadFeedback();
+</script>
+
+</body>
+</html>
